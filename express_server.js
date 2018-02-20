@@ -1,12 +1,13 @@
-var express = require("express");
-var app = express();
-var PORT = process.env.PORT || 8080; // default port 8080
+const express = require("express");
+const app = express();
+const PORT = process.env.PORT || 8080; // default port 8080
+const bodyParser = require("body-parser");
 
 app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({extended: true}));
 
 //Remember: This will create a server at http://localhost:8080/urls
 //Additional paths may be specified after the port number
-
 
 //When you pass an object into res.render, it gives you access to all the key-value
 //pairs inside that object. Thus you can call entries["b2xVn2"], and you can loop over them:
@@ -25,6 +26,16 @@ var urlDatabase = {
 
 app.get("/", (req, res) => {
   res.end("Hello!");
+});
+
+// http://localhost:8080/urls/new
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+app.post("/urls", (req, res) => {
+  console.log(req.body);  // debug statement to see POST parameters
+  res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
 // http://localhost:8080/urls
