@@ -9,6 +9,21 @@ app.use(bodyParser.urlencoded({extended: true}));
 //Remember: This will create a server at http://localhost:8080/urls
 //Additional paths may be specified after the port number
 
+function generateRandomString(){
+  function randomInt36(){
+    return Math.floor(Math.random()*37);
+  }
+  let newURL = '';
+  let alphanumVals = 'abcdefghijklmnopqrstuvwxyz0123456789'; //36 vals
+  for(let i = 0; i < 6; i++){
+    newURL += alphanumVals[randomInt36()]
+  }
+  return newURL;
+}
+
+
+
+
 //When you pass an object into res.render, it gives you access to all the key-value
 //pairs inside that object. Thus you can call entries["b2xVn2"], and you can loop over them:
 /*
@@ -17,6 +32,7 @@ for(var index in entries){
   console.log(entries[index]) //Will print www.lighthouselabs.ca ...
 }
 */
+
 var urlDatabase = {
   entries: {
   "b2xVn2": "http://www.lighthouselabs.ca",
