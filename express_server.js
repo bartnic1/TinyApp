@@ -36,7 +36,7 @@ app.get("/urls", (req, res) => {
 // http://localhost:8080/urls/b2xVn2
 // http://localhost:8080/urls/9sm5xK
 app.get("/urls/:id", (req, res) => {
-  let singleEntry = {entry: {"short": req.params.id, "long": urlDatabase.entries[req.params.id]}};
+  let singleEntry = {entry: {"short": `tinyapp/${req.params.id}`, "long": urlDatabase.entries[req.params.id]}};
   // var singleEntry = {entry: {req.params.id: urlDatabase.entries[req.params.id]}};
   let templateVars = singleEntry;
   res.render("urls_show", templateVars);
