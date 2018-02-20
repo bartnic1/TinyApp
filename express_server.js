@@ -21,9 +21,6 @@ function generateRandomString(){
   return newURL;
 }
 
-
-
-
 //When you pass an object into res.render, it gives you access to all the key-value
 //pairs inside that object. Thus you can call entries["b2xVn2"], and you can loop over them:
 /*
@@ -50,8 +47,11 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  // console.log(req.body);  //debug statement to see POST parameters
+  var tinyURL = generateRandomString();
+  console.log(tinyURL);
+  urlDatabase.entries[tinyURL] = req.body["longURL"];
+  res.redirect(`http://localhost:8080/urls/${tinyURL}`);         // Respond with 'Ok' (we will replace this)
 });
 
 // http://localhost:8080/urls
@@ -69,15 +69,14 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-/*
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+app.get("/u/:shortURL", (req, res) => {
+  console.log(req.params);
+  let longURL = urlDatabase.entries[req.params["shortURL"]]
+  res.redirect(longURL);
 });
 
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
-});
-*/
+// null undefined false 0 [] ''
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
