@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+  <style>
+  table {
+    border-collapse: collapse;
+    border-spacing: 0px;
+  }
+  table, th, td {
+    padding: 5px;
+    border: 1px solid black;
+  }
+  </style>
+</head>
+<body>
+    <!-- Add your EJS code here -->
+    <table>
+      <tr>
+        <th>Short URL</th>
+        <th>Long URL</th>
+      </tr>
+      <%for (var key in entries){ %>
+      <tr>
+        <td><%=key %></td>
+        <td><%=entries[key] %></td>
+      </tr>
+      <%}%>
+    </table>
+    </br>
+    <a href="">Link to shorten URL</a>
+</body>
+</html>
