@@ -42,22 +42,27 @@ var urlDatabase = {
   }
 };
 
+//redirect is better than render, since the latter has to recreate the entire page!
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body["username"]);
+  res.cookie(req.body["username"]);
   urlDatabase.uservars.username = req.body["username"]
-  console.log("Cookies", req.cookies);
   res.redirect("/urls");
 });
+
+app.post("/logout", (req, res) => {
+  res.clearCookie(urlDatabase.uservars.username);
+  urlDatabase.uservars.username = '';
+  res.redirect("/urls");
+})
 
 
 app.post("/urls", (req, res) => {
   var tinyURL = generateRandomString();
   urlDatabase.entries[tinyURL] = req.body["longURL"];
-  res.redirect(`http://localhost:8080/urls/${tinyURL}`);         // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${tinyURL}`);         // Respond with 'Ok' (we will replace this)
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  console.log(req.params.id);
   delete urlDatabase.entries[req.params.id];
   res.redirect("/urls");
 });
@@ -82,11 +87,8 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars)
 });
 
-// http://localhost:8080/urls/b2xVn2
-// http://localhost:8080/urls/9sm5xK
 app.get("/urls/:id", (req, res) => {
   let singleEntry = {entry: {"short": req.params.id, "long": urlDatabase.entries[req.params.id]}, uservars: {username: urlDatabase.uservars.username}};
-  // var singleEntry = {entry: {req.params.id: urlDatabase.entries[req.params.id]}};
   let templateVars = singleEntry;
   res.render("urls_show", templateVars);
 });
