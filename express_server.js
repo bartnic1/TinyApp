@@ -47,11 +47,14 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  // console.log(req.body);  //debug statement to see POST parameters
   var tinyURL = generateRandomString();
-  console.log(tinyURL);
   urlDatabase.entries[tinyURL] = req.body["longURL"];
   res.redirect(`http://localhost:8080/urls/${tinyURL}`);         // Respond with 'Ok' (we will replace this)
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase.entries[req.params.id];
+  res.redirect("/urls");
 });
 
 // http://localhost:8080/urls
