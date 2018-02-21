@@ -33,6 +33,9 @@ for(var index in entries){
 */
 
 var urlDatabase = {
+  uservars: {
+    username: ''
+  },
   entries: {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -41,8 +44,9 @@ var urlDatabase = {
 
 app.post("/login", (req, res) => {
   res.cookie("username", req.body["username"]);
-  res.redirect("/urls");
+  urlDatabase.uservars.username = req.body["username"]
   console.log("Cookies", req.cookies);
+  res.redirect("/urls");
 });
 
 
@@ -81,7 +85,7 @@ app.get("/urls", (req, res) => {
 // http://localhost:8080/urls/b2xVn2
 // http://localhost:8080/urls/9sm5xK
 app.get("/urls/:id", (req, res) => {
-  let singleEntry = {entry: {"short": req.params.id, "long": urlDatabase.entries[req.params.id]}};
+  let singleEntry = {entry: {"short": req.params.id, "long": urlDatabase.entries[req.params.id]}, uservars: {username: urlDatabase.uservars.username}};
   // var singleEntry = {entry: {req.params.id: urlDatabase.entries[req.params.id]}};
   let templateVars = singleEntry;
   res.render("urls_show", templateVars);
