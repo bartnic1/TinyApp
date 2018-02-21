@@ -2,9 +2,11 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 //Remember: This will create a server at http://localhost:8080/urls
 //Additional paths may be specified after the port number
@@ -37,6 +39,11 @@ var urlDatabase = {
   }
 };
 
+app.post("/login", (req, res) => {
+  res.cookie("username", req.body["username"]);
+  res.redirect("/urls");
+  console.log("Cookies", req.cookies);
+});
 
 
 app.post("/urls", (req, res) => {
