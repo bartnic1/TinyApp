@@ -37,14 +37,7 @@ var urlDatabase = {
   }
 };
 
-app.get("/", (req, res) => {
-  res.end("Hello!");
-});
 
-// http://localhost:8080/urls/new
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
-});
 
 app.post("/urls", (req, res) => {
   var tinyURL = generateRandomString();
@@ -53,8 +46,23 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
+  console.log(req.params.id);
   delete urlDatabase.entries[req.params.id];
   res.redirect("/urls");
+});
+
+app.post("/urls/:id", (req, res) => {
+  urlDatabase.entries[req.params.id] = req.body["longURL"];
+  res.redirect("/urls");
+});
+
+app.get("/", (req, res) => {
+  res.end("Hello!");
+});
+
+// http://localhost:8080/urls/new
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
 });
 
 // http://localhost:8080/urls
@@ -66,7 +74,7 @@ app.get("/urls", (req, res) => {
 // http://localhost:8080/urls/b2xVn2
 // http://localhost:8080/urls/9sm5xK
 app.get("/urls/:id", (req, res) => {
-  let singleEntry = {entry: {"short": `tinyapp/${req.params.id}`, "long": urlDatabase.entries[req.params.id]}};
+  let singleEntry = {entry: {"short": req.params.id, "long": urlDatabase.entries[req.params.id]}};
   // var singleEntry = {entry: {req.params.id: urlDatabase.entries[req.params.id]}};
   let templateVars = singleEntry;
   res.render("urls_show", templateVars);

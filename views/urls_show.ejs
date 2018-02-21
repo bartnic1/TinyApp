@@ -5,9 +5,10 @@
 </head>
 <body>
     <!-- Add your EJS code here -->
-    <h2>Short</h2>
-    <h3><%= entry.short%></h3>
-    <h2>Long</h2>
-    <h3><%= entry.long%></h3>
+    <h2>Short URL: <b><%= entry.short%></b></h2>
+    <form method="POST" action="/urls/<%= entry.short%>">
+      <input type="text" value="<%=entry.long%>" name="longURL">
+      <input type="submit" value="Update">
+    </form>
 </body>
 </html>

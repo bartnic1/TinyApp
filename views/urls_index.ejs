@@ -19,12 +19,14 @@
       <tr>
         <th>Short URL</th>
         <th>Long URL</th>
+        <th>Edit URL</th>
         <th>Delete URL</th>
       </tr>
       <%for (var key in entries){ %>
       <tr>
         <td><%=key %></td>
         <td><%=entries[key] %></td>
+        <td><a href="/urls/<%=key%>">Edit</a></td>
         <td>
         <form method="POST" action="/urls/<%=key%>/delete">
         <input type="submit" value="Delete" name="<%=key%>" style="margin-left: 15px">
