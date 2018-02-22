@@ -1,14 +1,12 @@
 <title>TinyApp</title>
-<label><%if(uservars.username){%>
-Welcome <%=uservars.username%> !
+<label><%if(user){%>
+Welcome <%=user.email%> !
 <form method="POST" action="/logout">
   <input type="submit" value="Logout">
 </form>
-<%}else {%>
-Please enter a username:
-<form method="POST" action="/login">
-  <input type="text" name="username">
-  <input type="submit" value="Submit">
-</form>
+<%}else{%>
+  <a href="/register" style="padding-right: 10px">Register</a>
+  <a href="/login">Login</a>
 <%}%>
 </label>
+</br>

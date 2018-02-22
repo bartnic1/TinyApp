@@ -24,10 +24,10 @@
         <th>Edit URL</th>
         <th>Delete URL</th>
       </tr>
-      <%for (var key in entries){ %>
+      <%for (var key in urlDatabase.entries){ %>
       <tr>
         <td><%=key %></td>
-        <td><%=entries[key] %></td>
+        <td><%=urlDatabase.entries[key] %></td>
         <td><a href="/urls/<%=key%>">Edit</a></td>
         <td>
         <form method="POST" action="/urls/<%=key%>/delete">
