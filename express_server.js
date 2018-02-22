@@ -23,6 +23,15 @@ function generateRandomString(){
   return newURL;
 }
 
+function urlsForUser(userID){
+  for (var entry in urlDatabase.entries){
+    if(urlDatabase.entries[entry].userID === userID){
+      localUrlDatabase["entries"][entry] = urlDatabase.entries[entry];
+      localUrlDatabase["anyEntries"] = true;
+    }
+  }
+}
+
 //When you pass an object into res.render, it gives you access to all the key-value
 //pairs inside that object. Thus you can call entries["b2xVn2"], and you can loop over them:
 /*
@@ -51,6 +60,10 @@ const urlDatabase = {
   }
 };
 
+const localUrlDatabase = {
+  entries: {},
+  anyEntries: false
+};
 
 //redirect is better than render, since the latter has to recreate the entire page!
 app.post("/login", (req, res) => {
@@ -84,7 +97,7 @@ app.post("/logout", (req, res) => {
 app.post("/urls", (req, res) => {
   let randURL = generateRandomString();
   urlDatabase.entries[randURL] = {userID: req.cookies.user_id, url: req.body["longURL"]};
-  console.log(urlDatabase);
+  urlsForUser(req.cookies.user_id);
   res.redirect("/urls");         // Respond with 'Ok' (we will replace this)
 });
 
@@ -132,10 +145,11 @@ app.get("/urls", (req, res) => {
       userInfo = users[user];
     }
   }
+  console.log("Local", localUrlDatabase.entries);
   //Note that by default, if userInfo is undefined, then entering "user" into
   //urls_index.ejs will result in nothing being generated, because it automatically
   //outputs the value of the key "user".
-  res.render("urls_index", {urlDatabase: urlDatabase, user: userInfo});
+  res.render("urls_index", {urlDatabase: localUrlDatabase, user: userInfo});
 });
 
 app.get("/register", (req, res) => {
@@ -146,15 +160,24 @@ app.get("/login", (req, res) => {
   res.render("login")
 })
 
-//Might want to change this!
 app.get("/urls/:id", (req, res) => {
-  let singleEntry = {entry: {short: req.params.id, long: urlDatabase.entries[req.params.id].url}, user: users[req.cookies.user_id]};
+  //loop over elements of local url database
+  let accessBool = false;
+  if(Object.keys(req.cookies).length === 0){
+    return res.status(401).send("Invalid User, access denied");
+  }
+  else if(urlDatabase.entries[req.params.id].userID === req.cookies.user_id){
+    accessBool = true;
+  }
+  if(!accessBool){
+    return res.status(401).send("Invalid User, access denied");
+  }
+  let singleEntry = {entry: {short: req.params.id, long: localUrlDatabase.entries[req.params.id].url}, user: users[req.cookies.user_id]};
   res.render("urls_show", singleEntry);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  console.log(req.params);
-  let longURL = urlDatabase.entries[req.params["shortURL"]]
+  let longURL = urlDatabase.entries[req.params["shortURL"]].url;
   res.redirect(longURL);
 });
 

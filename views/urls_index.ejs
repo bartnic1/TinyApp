@@ -16,7 +16,9 @@
   </style>
 </head>
 <body>
-    <!-- Add your EJS code here -->
+    <!-- Test whether a user is logged in, and whether that user has a database of URLs -->
+    <%if(user){%>
+    <%if(urlDatabase.anyEntries){%>
     <table>
       <tr>
         <th>Short URL</th>
@@ -28,25 +30,20 @@
       <tr>
         <td><%=key %></td>
         <td><%=urlDatabase.entries[key].url %></td>
-        <%if(user){%>
-        <%if(urlDatabase.entries[key].userID === user.id){%>
         <td><a href="/urls/<%=key%>">Edit</a></td>
         <td>
         <form method="POST" action="/urls/<%=key%>/delete">
         <input type="submit" value="Delete" name="<%=key%>" style="margin-left: 15px">
         </form>
         </td>
-        <%}else{%>
-        <td>User mismatch</td>
-        <td>User mismatch</td>
-        <%}}else{%>
-        <td>User mismatch</td>
-        <td>User mismatch</td>
-        <%}%>
       </tr>
-      <%}%>
     </table>
-    </br>
+    <%}}else{%>
+    No URLs created yet!
+    <%}}else{%>
+    Register or login to see your URLs!
+    <%}%>
+    </br></br>
     <%if(user){%>
       <a href="/urls/new">Create a New tinyURL</a>
     <%}else{%>
