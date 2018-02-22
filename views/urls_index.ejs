@@ -27,8 +27,15 @@
       <%for (var key in urlDatabase.entries){ %>
       <tr>
         <td><%=key %></td>
-        <td><%=urlDatabase.entries[key] %></td>
+        <td><%=urlDatabase.entries[key].url %></td>
+        <%if(user){%>
+        <%if(urlDatabase.entries[key].userID === user.id){%>
         <td><a href="/urls/<%=key%>">Edit</a></td>
+        <%}else{%>
+        <td>User mismatch</td>
+        <%}}else{%>
+        <td>User mismatch</td>
+        <%}%>
         <td>
         <form method="POST" action="/urls/<%=key%>/delete">
         <input type="submit" value="Delete" name="<%=key%>" style="margin-left: 15px">
@@ -38,10 +45,10 @@
       <%}%>
     </table>
     </br>
-    <a href="">Link to shorten URL</a>
-    <!-- <form method="POST" action="/urls/9sm5xK/delete">
-      <button
-    </form>
-     -->
+    <%if(user){%>
+      <a href="/urls/new">Create a New tinyURL</a>
+    <%}else{%>
+      <a href="/login">Create a New tinyURL</a>
+    <%}%>
 </body>
 </html>

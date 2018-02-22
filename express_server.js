@@ -46,10 +46,11 @@ const users = {
 
 const urlDatabase = {
   entries: {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {userID: "userRandomID", url: "http://www.lighthouselabs.ca"},
+  "9sm5xK": {userID: "user2RandomID", url: "http://www.google.com"}
   }
 };
+
 
 //redirect is better than render, since the latter has to recreate the entire page!
 app.post("/login", (req, res) => {
@@ -72,7 +73,7 @@ app.post("/login", (req, res) => {
     return res.status(403).send("Password incorrect!");
   }
   res.cookie("user_id", userID);
-  res.redirect("/");
+  res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
@@ -81,9 +82,10 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  var tinyURL = generateRandomString();
-  urlDatabase.entries[tinyURL] = req.body["longURL"];
-  res.redirect(`/urls/${tinyURL}`);         // Respond with 'Ok' (we will replace this)
+  let randURL = generateRandomString();
+  urlDatabase.entries[randURL] = {userID: req.cookies.user_id, url: req.body["longURL"]};
+  console.log(urlDatabase);
+  res.redirect("/urls");         // Respond with 'Ok' (we will replace this)
 });
 
 app.post("/register", (req, res) => {
@@ -109,7 +111,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  urlDatabase.entries[req.params.id] = req.body["longURL"];
+  urlDatabase.entries[req.params.id].url = req.body["longURL"];
   res.redirect("/urls");
 });
 
@@ -119,7 +121,7 @@ app.get("/", (req, res) => {
 
 // http://localhost:8080/urls/new
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  res.render("urls_new", {urlDatabase: urlDatabase, user: users[req.cookies.user_id]});
 });
 
 // http://localhost:8080/urls
@@ -130,6 +132,9 @@ app.get("/urls", (req, res) => {
       userInfo = users[user];
     }
   }
+  //Note that by default, if userInfo is undefined, then entering "user" into
+  //urls_index.ejs will result in nothing being generated, because it automatically
+  //outputs the value of the key "user".
   res.render("urls_index", {urlDatabase: urlDatabase, user: userInfo});
 });
 
@@ -143,7 +148,7 @@ app.get("/login", (req, res) => {
 
 //Might want to change this!
 app.get("/urls/:id", (req, res) => {
-  let singleEntry = {entry: {short: req.params.id, long: urlDatabase.entries[req.params.id]}, user: users[req.cookies.user_id]};
+  let singleEntry = {entry: {short: req.params.id, long: urlDatabase.entries[req.params.id].url}, user: users[req.cookies.user_id]};
   res.render("urls_show", singleEntry);
 });
 
