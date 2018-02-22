@@ -55,7 +55,6 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 })
 
-
 app.post("/urls", (req, res) => {
   var tinyURL = generateRandomString();
   urlDatabase.entries[tinyURL] = req.body["longURL"];
