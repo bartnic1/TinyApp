@@ -31,16 +31,18 @@
         <%if(user){%>
         <%if(urlDatabase.entries[key].userID === user.id){%>
         <td><a href="/urls/<%=key%>">Edit</a></td>
-        <%}else{%>
-        <td>User mismatch</td>
-        <%}}else{%>
-        <td>User mismatch</td>
-        <%}%>
         <td>
         <form method="POST" action="/urls/<%=key%>/delete">
         <input type="submit" value="Delete" name="<%=key%>" style="margin-left: 15px">
         </form>
         </td>
+        <%}else{%>
+        <td>User mismatch</td>
+        <td>User mismatch</td>
+        <%}}else{%>
+        <td>User mismatch</td>
+        <td>User mismatch</td>
+        <%}%>
       </tr>
       <%}%>
     </table>
