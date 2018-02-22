@@ -44,7 +44,7 @@ const users = {
   }
 }
 
-var urlDatabase = {
+const urlDatabase = {
   uservars: {
     username: ''
   },
@@ -74,7 +74,20 @@ app.post("/urls", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  res.send(req.body);
+  let newID = generateRandomString();
+  let userEmail = req.body.email;
+  let userPass = req.body.password;
+  if(!userEmail || !userPass){
+    return res.status(400).send("E-mail and/or password missing");
+  }
+  for(var user in users){
+    if(users[user].email === userEmail){
+      return res.status(400).send("E-mail taken by existing user!")
+    }
+  }
+  users[newID] = {id: newID, email: req.body.email, password: req.body.password};
+  res.cookie("user_id", newID);
+  res.redirect("/urls");
 })
 
 app.post("/urls/:id/delete", (req, res) => {
