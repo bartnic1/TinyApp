@@ -31,6 +31,18 @@ for(var index in entries){
   console.log(entries[index]) //Will print www.lighthouselabs.ca ...
 }
 */
+const users = {
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
 
 var urlDatabase = {
   uservars: {
@@ -61,6 +73,10 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${tinyURL}`);         // Respond with 'Ok' (we will replace this)
 });
 
+app.post("/register", (req, res) => {
+  res.send(req.body);
+})
+
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase.entries[req.params.id];
   res.redirect("/urls");
@@ -84,6 +100,11 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls", (req, res) => {
   let templateVars = urlDatabase;
   res.render("urls_index", templateVars)
+});
+
+app.get("/register", (req, res) => {
+  let templateVars = urlDatabase;
+  res.render("register", templateVars)
 });
 
 app.get("/urls/:id", (req, res) => {
