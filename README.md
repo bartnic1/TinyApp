@@ -31,9 +31,9 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - You will now see an updated table listing your tinyURL IDs and their associated long URLs.
 - At any time, the user may edit or delete these URLs.
 
-- To navigate to the long-form, simply enter the short URL code (e.g. hn8vft) into the following address:
+- To navigate to the long-form, simply enter the short URL code (e.g. pi3kpr) into the following address:
 
-||/u/hn8vft
+||/u/pi3kpr
 
 This will immediately redirect the user to the original URL.
 
