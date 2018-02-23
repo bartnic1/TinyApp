@@ -20,7 +20,7 @@
   }
   .center-div{
     margin: 0 auto;
-    width: 400px;
+    width: 450px;
   }
   </style>
 </head>
@@ -28,25 +28,30 @@
   <div class="center-text">
     <% include partials/_header %>
   </div>
-    <!-- Test whether a user is logged in, and whether that user has a database of URLs -->
-    <!-- If both tests pass, then this form automatically generates the necessary number of rows -->
+    <!-- Tests whether a user is logged in - if not, prompts the user to log in or register.
+    If the user is logged in, but has no data, a message displays that no URLs exist.
+    Otherwise, EJS automatically generates the necessary table.-->
     <%if(user){%>
-    <%if(Object.keys(urlDatabase.entries).length !== 0){%>
+    <%if(Object.keys(localUrlDatabase.entries).length !== 0){%>
     <div class="center-div">
     <table>
       <tr>
+        <th>Date Made (mm/dd/yyyy)</th>
         <th>Tiny URL</th>
         <th>Long URL</th>
         <th>Edit URL</th>
         <th>Delete URL</th>
       </tr>
-      <%for (var key in urlDatabase.entries){ %>
+      <%for (var key in localUrlDatabase.entries){ %>
       <tr>
+        <td>
+          <%=localUrlDatabase.entries[key].date%>
+        </td>
         <td>
           <%=key%>
         </td>
         <td>
-          <%=urlDatabase.entries[key].url %>
+          <%=localUrlDatabase.entries[key].url %>
         </td>
         <td>
           <form method="GET" action="/urls/<%=key%>">
