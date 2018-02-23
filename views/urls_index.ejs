@@ -18,7 +18,7 @@
 <body>
     <!-- Test whether a user is logged in, and whether that user has a database of URLs -->
     <%if(user){%>
-    <%if(urlDatabase.anyEntries){%>
+    <%if(Object.keys(urlDatabase.entries).length !== 0){%>
     <table>
       <tr>
         <th>Short URL</th>

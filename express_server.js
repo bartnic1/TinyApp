@@ -3,6 +3,7 @@ const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -24,10 +25,13 @@ function generateRandomString(){
 }
 
 function urlsForUser(userID){
+  //Clear the database of any previous user data
+  delete localUrlDatabase.entries;
+  localUrlDatabase.entries = {};
+  //Now refill with user-related data
   for (var entry in urlDatabase.entries){
     if(urlDatabase.entries[entry].userID === userID){
       localUrlDatabase["entries"][entry] = urlDatabase.entries[entry];
-      localUrlDatabase["anyEntries"] = true;
     }
   }
 }
@@ -44,12 +48,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
   }
 }
 
@@ -61,8 +65,7 @@ const urlDatabase = {
 };
 
 const localUrlDatabase = {
-  entries: {},
-  anyEntries: false
+  entries: {}
 };
 
 //redirect is better than render, since the latter has to recreate the entire page!
@@ -73,7 +76,7 @@ app.post("/login", (req, res) => {
   for(user in users){
     if(users[user].email === req.body.email){
       emailFound = true;
-      if(users[user].password === req.body.password){
+      if(bcrypt.compareSync(req.body.password, users[user].password)){
         passFound = true;
         userID = users[user].id;
       }
@@ -97,7 +100,6 @@ app.post("/logout", (req, res) => {
 app.post("/urls", (req, res) => {
   let randURL = generateRandomString();
   urlDatabase.entries[randURL] = {userID: req.cookies.user_id, url: req.body["longURL"]};
-  urlsForUser(req.cookies.user_id);
   res.redirect("/urls");         // Respond with 'Ok' (we will replace this)
 });
 
@@ -113,7 +115,8 @@ app.post("/register", (req, res) => {
       return res.status(400).send("E-mail taken by existing user!")
     }
   }
-  users[newID] = {id: newID, email: req.body.email, password: req.body.password};
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  users[newID] = {id: newID, email: req.body.email, password: hashedPassword};
   res.cookie("user_id", newID);
   res.redirect("/urls");
 })
@@ -145,7 +148,7 @@ app.get("/urls", (req, res) => {
       userInfo = users[user];
     }
   }
-  console.log("Local", localUrlDatabase.entries);
+  urlsForUser(req.cookies.user_id);
   //Note that by default, if userInfo is undefined, then entering "user" into
   //urls_index.ejs will result in nothing being generated, because it automatically
   //outputs the value of the key "user".
