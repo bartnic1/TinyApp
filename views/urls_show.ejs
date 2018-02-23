@@ -13,17 +13,36 @@
         text-align: center;
         margin: 40px 0 0 0;
       }
+      .center-no-margin{
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     <div class="center-text">
       <% include partials/_header %>
     </div>
+    <div class="center-no-margin">
+      <span class="margin">
+        <b>Generated:</b> <%=date%>
+      </span>
+      <span class="margin">
+        <b>Uses:</b> <%=uses%>
+      </span>
+      <span class="margin">
+        <b>Unique Uses:</b> <%=uniqueUses%>
+      </span>
+    </div>
     <div class="center-reduced-margin">
-      <h2>Tiny URL: <b><%= entry.short%></b></h2>
-      <form method="POST" action="/urls/<%= entry.short%>">
-        <input type="text" value="<%=entry.long%>" name="longURL">
+      <h2>Tiny URL: <b><%=short%></b></h2>
+      <form method="POST" action="/urls/<%=short%>">
+        <input type="text" value="<%=long%>" name="longURL">
         <input type="submit" value="Update">
+      </form>
+    </div>
+    <div class="center-reduced-margin">
+      <form method="GET" action="/urls">
+        <input type="submit" value="Back to URL List">
       </form>
     </div>
   </body>

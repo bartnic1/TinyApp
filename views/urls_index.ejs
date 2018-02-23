@@ -20,7 +20,7 @@
   }
   .center-div{
     margin: 0 auto;
-    width: 450px;
+    width: 650px;
   }
   </style>
 </head>
@@ -36,6 +36,8 @@
     <div class="center-div">
     <table>
       <tr>
+        <th>Unique Uses</th>
+        <th>Uses</th>
         <th>Date Made (mm/dd/yyyy)</th>
         <th>Tiny URL</th>
         <th>Long URL</th>
@@ -44,6 +46,12 @@
       </tr>
       <%for (var key in localUrlDatabase.entries){ %>
       <tr>
+        <td>
+          <%=localUrlDatabase.entries[key].uniqueUses%>
+        </td>
+        <td>
+          <%=localUrlDatabase.entries[key].uses%>
+        </td>
         <td>
           <%=localUrlDatabase.entries[key].date%>
         </td>

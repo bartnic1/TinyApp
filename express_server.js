@@ -18,6 +18,10 @@ app.use(cookieSession({
   maxAge: 24*60*60*1000
 }))
 
+//-----------------------------------------------------------------//
+// Functions
+//-----------------------------------------------------------------//
+
 //This function generates the tiny URL by randomly choosing values from an alphanumeric string.
 function generateRandomString(){
   function randomInt36(){
@@ -31,18 +35,6 @@ function generateRandomString(){
   return newURL;
 }
 
-//This function checks which URLs a user has access to, and logs them to a local URL database (with global scope).
-function urlsForUser(userID){
-  //Clear the database of any previous user data
-  delete localUrlDatabase.entries;
-  localUrlDatabase.entries = {};
-  //Now refill with user-related data
-  for (var entry in urlDatabase.entries){
-    if(urlDatabase.entries[entry].userID === userID){
-      localUrlDatabase["entries"][entry] = urlDatabase.entries[entry];
-    }
-  }
-}
 //Gets the current date; used when generating new URLs.
 function getDate(){
   let today = new Date();
@@ -57,6 +49,28 @@ function getDate(){
   }
   return `${month}/${day}/${year}`
 }
+
+//This function checks which URLs a user has access to, and logs them to a local URL database (with global scope).
+function urlsForUser(userID){
+  //Clear the database of any previous user data
+  delete localUrlDatabase.entries;
+  localUrlDatabase.entries = {};
+  //Now refill with user-related data
+  for (var entry in urlDatabase.entries){
+    if(urlDatabase.entries[entry].userID === userID){
+      localUrlDatabase["entries"][entry] = urlDatabase.entries[entry];
+    }
+  }
+}
+
+//-----------------------------------------------------------------//
+// Databases
+//-----------------------------------------------------------------//
+
+
+// Sample entry:
+// "b2xVn2": {user1: 1, user2: 3}
+const urlsVisited = {}
 
 //This object defines all of the registered users. Some default users exist as examples.
 const users = {
@@ -77,8 +91,8 @@ const users = {
 //Each shortURL is assigned a userID, a long URL, and the time it was created (month/day/year)
 const urlDatabase = {
   entries: {
-  "b2xVn2": {userID: "userRandomID", url: "http://www.lighthouselabs.ca", time:"05/09/2005" },
-  "9sm5xK": {userID: "user2RandomID", url: "http://www.google.com", time: "01/10/2009"}
+  "b2xVn2": {userID: "userRandomID", url: "http://www.lighthouselabs.ca", date:"05/09/2005", uses: 0, uniqueUses: 0},
+  "9sm5xK": {userID: "user2RandomID", url: "http://www.google.com", date: "01/10/2009", uses: 0, uniqueUses: 0}
   }
 };
 
@@ -87,9 +101,27 @@ const localUrlDatabase = {
 };
 
 //-----------------------------------------------------------------//
-//App.post requests below
+// App.post requests
 //-----------------------------------------------------------------//
 
+//Registers the user in the users database, and automatically logs in the user by creating a session cookie. Passwords are once again stored in hashed form for extra protection.
+app.post("/register", (req, res) => {
+  let newID = generateRandomString();
+  let userEmail = req.body.email;
+  let userPass = req.body.password;
+  if(!userEmail || !userPass){
+    return res.status(400).send("E-mail and/or password missing");
+  }
+  for(var user in users){
+    if(users[user].email === userEmail){
+      return res.status(400).send("E-mail taken by existing user!")
+    }
+  }
+  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+  users[newID] = {id: newID, email: req.body.email, password: hashedPassword};
+  req.session.user_id = newID;
+  res.redirect("/urls");
+})
 
 //The call to post to the login screen is used to enter e-mail and password data.
 //If everything matches, a cookie is created based on the user's ID (from the database above)
@@ -122,35 +154,16 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-//Generates a tinyURL based on values entered into a form, including the date it was created.
+//Generates a tinyURL based on values entered into a form, including date created and uses.
 app.post("/urls", (req, res) => {
   if(Object.keys(req.session).length === 0){
     return res.status(401).send("No registered user detected. Access denied.")
   }
   let randURL = generateRandomString();
   let date = getDate();
-  urlDatabase.entries[randURL] = {userID: req.session.user_id, url: req.body["longURL"], date: date};
+  urlDatabase.entries[randURL] = {userID: req.session.user_id, url: req.body["longURL"], date: date, uses: 0, uniqueUses: 0};
   res.redirect(`/urls/${randURL}`);
 });
-
-//Registers the user in the users database, and automatically logs in the user by creating a session cookie. Passwords are once again stored in hashed form for extra protection.
-app.post("/register", (req, res) => {
-  let newID = generateRandomString();
-  let userEmail = req.body.email;
-  let userPass = req.body.password;
-  if(!userEmail || !userPass){
-    return res.status(400).send("E-mail and/or password missing");
-  }
-  for(var user in users){
-    if(users[user].email === userEmail){
-      return res.status(400).send("E-mail taken by existing user!")
-    }
-  }
-  const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-  users[newID] = {id: newID, email: req.body.email, password: hashedPassword};
-  req.session.user_id = newID;
-  res.redirect("/urls");
-})
 
 //Allows a registered user to delete his/her own unwanted URLs.
 app.post("/urls/:id/delete", (req, res) => {
@@ -166,18 +179,24 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //Allows users to edit their long-form URL, if desired.
 app.post("/urls/:id", (req, res) => {
+  let databaseURLObj = urlDatabase.entries[req.params.id];
   if(Object.keys(req.session).length === 0){
     return res.status(401).send("No registered user detected. Access denied.")
   }
-  else if(urlDatabase.entries[req.params.id].userID !== req.session.user_id){
+  else if(databaseURLObj.userID !== req.session.user_id){
     return res.status(401).send("Incorrect user. Access denied.")
   }
-  urlDatabase.entries[req.params.id].url = req.body["longURL"];
+  //Reset number of uses if longURL is changed
+  if(req.body["longURL"] !== databaseURLObj){
+    databaseURLObj.uses = 0;
+    databaseURLObj.uniqueUses = 0;
+  }
+  databaseURLObj.url = req.body["longURL"];
   res.redirect("/urls");
 });
 
 //-----------------------------------------------------------------//
-//App.get requests below
+// App.get requests
 //-----------------------------------------------------------------//
 
 //The root directory serves no real function in this app, and so redirects to appropriate directories depending on whether a user is logged in or not.
@@ -187,26 +206,6 @@ app.get("/", (req, res) => {
   }else{
     res.redirect("/login");
   }
-});
-
-//Allows a user to visit a page where they may create a new tinyURL for themselves.
-app.get("/urls/new", (req, res) => {
-  if(Object.keys(req.session).length === 0){
-    return res.redirect("/login");
-  }
-  res.render("urls_new", {urlDatabase: urlDatabase, user: users[req.session.user_id]});
-});
-
-//This is the main page, that displays all of a user's personal tinyURLs. The urlsForUser() function call ensurse that only URLs tied to their account are visible.
-app.get("/urls", (req, res) => {
-  let userInfo;
-  for(var user in users){
-    if(user === req.session.user_id){
-      userInfo = users[user];
-    }
-  }
-  urlsForUser(req.session.user_id);
-  res.render("urls_index", {localUrlDatabase: localUrlDatabase, user: userInfo});
 });
 
 //This displays the registration page, where a user may register a new account.
@@ -225,6 +224,27 @@ app.get("/login", (req, res) => {
   res.render("login")
 })
 
+//This is the main page, that displays all of a user's personal tinyURLs. The urlsForUser() function call ensurse that only URLs tied to their account are visible.
+app.get("/urls", (req, res) => {
+  let userInfo;
+  for(var user in users){
+    if(user === req.session.user_id){
+      userInfo = users[user];
+    }
+  }
+  //urlsForUser sets the global variable localUrlDatabase for the session user
+  urlsForUser(req.session.user_id);
+  res.render("urls_index", {localUrlDatabase: localUrlDatabase, user: userInfo});
+});
+
+//Allows a user to visit a page where they may create a new tinyURL for themselves.
+app.get("/urls/new", (req, res) => {
+  if(Object.keys(req.session).length === 0){
+    return res.redirect("/login");
+  }
+  res.render("urls_new", {urlDatabase: urlDatabase, user: users[req.session.user_id]});
+});
+
 //This displays a user's long-form URL together with its tinyURL form. The user may either confirm its contents or augment it using the associated POST method to the same URL.
 app.get("/urls/:id", (req, res) => {
   //First, test whether the appropriate user has access to the resources on this page
@@ -241,17 +261,35 @@ app.get("/urls/:id", (req, res) => {
   if(!accessBool){
     return res.status(401).send("Incorrect User. Access denied.");
   }
-  let singleEntry = {entry: {short: req.params.id, long: urlDatabase.entries[req.params.id].url}, user: users[req.session.user_id]};
+  let databaseURLObj = urlDatabase.entries[req.params.id];
+  let singleEntry = {short: req.params.id, long: databaseURLObj.url, user: users[req.session.user_id], date: databaseURLObj.date, uses: databaseURLObj.uses, uniqueUses: databaseURLObj.uniqueUses};
   res.render("urls_show", singleEntry);
 });
 
 //This allows the user to enter their tinyURL into the browser address bar, which will redirect them to the long-form URL.
 app.get("/u/:shortURL", (req, res) => {
-  if(urlDatabase.entries[req.params["shortURL"]] === undefined){
+  let urlLink = urlDatabase.entries[req.params["shortURL"]];
+  let urlVisitCount = urlsVisited[req.params["shortURL"]];
+  if(urlLink === undefined){
     return res.status(404).send("Invalid tinyURL code entered. Redirect aborted.")
   }
-  let longURL = urlDatabase.entries[req.params["shortURL"]].url;
-  res.redirect(longURL);
+  //Increase total number of uses for this link
+  urlLink.uses++;
+  //Increase total number of unique uses for this link by updating a urlsVisited database with global scope:
+
+  if(urlVisitCount === undefined){
+    let newObj = {};
+    newObj[req.session.user_id] = 1;
+    urlsVisited[req.params["shortURL"]] = newObj;
+    urlLink.uniqueUses++;
+    console.log("hello1");
+  }
+  else if (urlVisitCount[req.session.user_id] === undefined){
+    urlVisitCount[req.session.user_id] = 1;
+    urlLink.uniqueUses++;
+    console.log("hello2");
+  }
+  res.redirect(urlLink.url);
 });
 
 //In the terminal, confirms that the local server is operational.
