@@ -19,9 +19,7 @@
     </style>
   </head>
   <body>
-    <div class="center-text">
-      <% include partials/_header %>
-    </div>
+    <% include partials/_header %>
     <div class="center-no-margin">
       <span class="margin">
         <b>Generated:</b> <%=date%>
@@ -35,7 +33,7 @@
     </div>
     <div class="center-reduced-margin">
       <h2>Tiny URL: <b><%=short%></b></h2>
-      <form method="POST" action="/urls/<%=short%>">
+      <form method="POST" action="/urls/<%=short%>?_method=PUT">
         <input type="text" value="<%=long%>" name="longURL">
         <input type="submit" value="Update">
       </form>

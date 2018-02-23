@@ -1,13 +1,12 @@
 <title>TinyApp</title>
-<label>
-<%if(user !== undefined){%>
-  Welcome <%=user.email%> !
-  <form method="POST" action="/logout" style="margin: 10px">
-    <input type="submit" value="Logout">
-  </form>
-<%}else{%>
-  <a href="/register" style="padding-right: 10px">Register</a>
-  <a href="/login">Login</a>
-<%}%>
-</label>
-</br>
+<div style="text-align: center; margin-top: 50px; margin-bottom: 100px">
+  <%if(user !== undefined){%>
+    Welcome <%=user.email%> !
+    <form method="POST" action="/logout?_method=PUT">
+      <input type="submit" value="Logout" style="margin: 10px">
+    </form>
+  <%}else{%>
+    <a href="/register" style="padding-right: 10px">Register</a>
+    <a href="/login">Login</a>
+  <%}%>
+</div>

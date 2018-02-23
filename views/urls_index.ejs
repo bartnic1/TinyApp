@@ -12,7 +12,7 @@
   }
   .center-text {
     text-align: center;
-    margin: 80px 0 0 0;
+    margin: 10px;
   }
   .center-reduced-margin{
     text-align: center;
@@ -25,9 +25,7 @@
   </style>
 </head>
 <body>
-  <div class="center-text">
     <% include partials/_header %>
-  </div>
     <!-- Tests whether a user is logged in - if not, prompts the user to log in or register.
     If the user is logged in, but has no data, a message displays that no URLs exist.
     Otherwise, EJS automatically generates the necessary table.-->
@@ -67,7 +65,7 @@
           </form>
         </td>
         <td>
-          <form method="POST" action="/urls/<%=key%>/delete">
+          <form method="POST" action="/urls/<%=key%>/delete?_method=DELETE">
           <input type="submit" value="Delete" name="<%=key%>" style="margin: 5px 15px 5px 15px">
           </form>
         </td>

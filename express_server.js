@@ -1,7 +1,7 @@
 //Import all dependencies
-
-const cookieSession = require('cookie-session');
 const express = require("express");
+const methodOverride = require('method-override')
+const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 
@@ -16,7 +16,8 @@ app.use(cookieSession({
   name: 'user_id',
   secret: 'abcdefg',
   maxAge: 24*60*60*1000
-}))
+}));
+app.use(methodOverride('_method'));
 
 //-----------------------------------------------------------------//
 // Functions
@@ -149,7 +150,7 @@ app.post("/login", (req, res) => {
 });
 
 //Clears the cookies from the server and redirects to the main URLs page.
-app.post("/logout", (req, res) => {
+app.put("/logout", (req, res) => {
   res.clearCookie("user_id");
   res.redirect("/urls");
 });
@@ -166,7 +167,7 @@ app.post("/urls", (req, res) => {
 });
 
 //Allows a registered user to delete his/her own unwanted URLs.
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id/delete", (req, res) => {
   if(Object.keys(req.session).length === 0){
     return res.status(401).send("No registered user detected. Access denied.")
   }
@@ -178,7 +179,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 //Allows users to edit their long-form URL, if desired.
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   let databaseURLObj = urlDatabase.entries[req.params.id];
   if(Object.keys(req.session).length === 0){
     return res.status(401).send("No registered user detected. Access denied.")
@@ -282,12 +283,10 @@ app.get("/u/:shortURL", (req, res) => {
     newObj[req.session.user_id] = 1;
     urlsVisited[req.params["shortURL"]] = newObj;
     urlLink.uniqueUses++;
-    console.log("hello1");
   }
   else if (urlVisitCount[req.session.user_id] === undefined){
     urlVisitCount[req.session.user_id] = 1;
     urlLink.uniqueUses++;
-    console.log("hello2");
   }
   res.redirect(urlLink.url);
 });
