@@ -1,16 +1,26 @@
+const cookieSession = require('cookie-session');
 const express = require("express");
+const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
+
 const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
-const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser');
-const bcrypt = require('bcrypt');
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'user_id',
+  secret: 'abcdefg',
+  maxAge: 24*60*60*1000
+}))
+
 
 //Remember: This will create a server at http://localhost:8080/urls
 //Additional paths may be specified after the port number
+
+//Not using this anymore, but keep as backup:
+//const cookieParser = require('cookie-parser');
+//app.use(cookieParser());
 
 function generateRandomString(){
   function randomInt36(){
@@ -88,7 +98,7 @@ app.post("/login", (req, res) => {
   if(!passFound){
     return res.status(403).send("Password incorrect!");
   }
-  res.cookie("user_id", userID);
+  req.session.user_id = userID;
   res.redirect("/urls");
 });
 
@@ -99,7 +109,7 @@ app.post("/logout", (req, res) => {
 
 app.post("/urls", (req, res) => {
   let randURL = generateRandomString();
-  urlDatabase.entries[randURL] = {userID: req.cookies.user_id, url: req.body["longURL"]};
+  urlDatabase.entries[randURL] = {userID: req.session.user_id, url: req.body["longURL"]};
   res.redirect("/urls");         // Respond with 'Ok' (we will replace this)
 });
 
@@ -117,7 +127,7 @@ app.post("/register", (req, res) => {
   }
   const hashedPassword = bcrypt.hashSync(req.body.password, 10);
   users[newID] = {id: newID, email: req.body.email, password: hashedPassword};
-  res.cookie("user_id", newID);
+  req.session.user_id = newID;
   res.redirect("/urls");
 })
 
@@ -137,18 +147,18 @@ app.get("/", (req, res) => {
 
 // http://localhost:8080/urls/new
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new", {urlDatabase: urlDatabase, user: users[req.cookies.user_id]});
+  res.render("urls_new", {urlDatabase: urlDatabase, user: users[req.session.user_id]});
 });
 
 // http://localhost:8080/urls
 app.get("/urls", (req, res) => {
   let userInfo;
   for(var user in users){
-    if(user === req.cookies.user_id){
+    if(user === req.session.user_id){
       userInfo = users[user];
     }
   }
-  urlsForUser(req.cookies.user_id);
+  urlsForUser(req.session.user_id);
   //Note that by default, if userInfo is undefined, then entering "user" into
   //urls_index.ejs will result in nothing being generated, because it automatically
   //outputs the value of the key "user".
@@ -166,16 +176,16 @@ app.get("/login", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   //loop over elements of local url database
   let accessBool = false;
-  if(Object.keys(req.cookies).length === 0){
+  if(Object.keys(req.session).length === 0){
     return res.status(401).send("Invalid User, access denied");
   }
-  else if(urlDatabase.entries[req.params.id].userID === req.cookies.user_id){
+  else if(urlDatabase.entries[req.params.id].userID === req.session.user_id){
     accessBool = true;
   }
   if(!accessBool){
     return res.status(401).send("Invalid User, access denied");
   }
-  let singleEntry = {entry: {short: req.params.id, long: localUrlDatabase.entries[req.params.id].url}, user: users[req.cookies.user_id]};
+  let singleEntry = {entry: {short: req.params.id, long: localUrlDatabase.entries[req.params.id].url}, user: users[req.session.user_id]};
   res.render("urls_show", singleEntry);
 });
 
