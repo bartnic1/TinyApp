@@ -20,7 +20,7 @@ app.use(cookieSession({
 app.use(methodOverride('_method'));
 
 //-----------------------------------------------------------------//
-// Functions
+// Functions                                                       //
 //-----------------------------------------------------------------//
 
 //This function generates the tiny URL by randomly choosing values from an alphanumeric string.
@@ -64,16 +64,43 @@ function urlsForUser(userID){
   }
 }
 
+//Adds a visitor to a URL's visit list (registered or not; in the latter, they get a random string as an ID)
+//Note that this function is meant to work with app.get("/u/:shortURL"); otherwise req.params["shortURL"] is undefined.
+function addVisitorID(req){
+  if(urlsVisitedTotal[req.params["shortURL"]] === undefined){
+    if(req.session.user_id === undefined){
+      let newVisit = [generateRandomString(), getDate()];
+      urlsVisitedTotal[req.params["shortURL"]] = [newVisit];
+    }
+    else{
+      let newVisit = [req.session.user_id, getDate()];
+      urlsVisitedTotal[req.params["shortURL"]] = [newVisit];
+    }
+  }
+  else{
+    if(req.session.user_id === undefined){
+      let newVisit = [generateRandomString(), getDate()];
+      urlsVisitedTotal[req.params["shortURL"]].push(newVisit);
+    }
+    else{
+      let newVisit = [req.session.user_id, getDate()];
+      urlsVisitedTotal[req.params["shortURL"]].push(newVisit);
+    }
+  }
+}
+
 //-----------------------------------------------------------------//
-// Databases
+// Databases                                                       //
 //-----------------------------------------------------------------//
 
+//Keeps track of all visitors for a specific URL
+const urlsVisitedTotal = {};
 
-// Sample entry:
-// "b2xVn2": {user1: 1, user2: 3}
-const urlsVisited = {}
+//urlsVisitedUnique keeps track of unique visitors for a specific URL
+//E.g. urlsVisitedUnique = {"b2xVn2": {user1: 1, user2: 1}}
+const urlsVisitedUnique = {};
 
-//This object defines all of the registered users. Some default users exist as examples.
+//users defines all of the registered users. Some default users exist as examples.
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -85,7 +112,7 @@ const users = {
     email: "user2@example.com",
     password: bcrypt.hashSync("dishwasher-funk", 10)
   }
-}
+};
 
 //The urlDatabase contains the URLs created by all users. The localUrlDatabase dynamically allocates URLs that were created by currently logged-in users, in the same format.
 
@@ -102,7 +129,7 @@ const localUrlDatabase = {
 };
 
 //-----------------------------------------------------------------//
-// App.post requests
+// App.post/delete/put requests                                    //
 //-----------------------------------------------------------------//
 
 //Registers the user in the users database, and automatically logs in the user by creating a session cookie. Passwords are once again stored in hashed form for extra protection.
@@ -197,7 +224,7 @@ app.put("/urls/:id", (req, res) => {
 });
 
 //-----------------------------------------------------------------//
-// App.get requests
+// App.get requests                                                //
 //-----------------------------------------------------------------//
 
 //The root directory serves no real function in this app, and so redirects to appropriate directories depending on whether a user is logged in or not.
@@ -263,30 +290,38 @@ app.get("/urls/:id", (req, res) => {
     return res.status(401).send("Incorrect User. Access denied.");
   }
   let databaseURLObj = urlDatabase.entries[req.params.id];
-  let singleEntry = {short: req.params.id, long: databaseURLObj.url, user: users[req.session.user_id], date: databaseURLObj.date, uses: databaseURLObj.uses, uniqueUses: databaseURLObj.uniqueUses};
+  let singleEntry = {short: req.params.id, long: databaseURLObj.url, user: users[req.session.user_id], date: databaseURLObj.date, uses: databaseURLObj.uses, uniqueUses: databaseURLObj.uniqueUses, visitLog: urlsVisitedTotal[req.params.id]};
   res.render("urls_show", singleEntry);
 });
 
 //This allows the user to enter their tinyURL into the browser address bar, which will redirect them to the long-form URL.
 app.get("/u/:shortURL", (req, res) => {
   let urlLink = urlDatabase.entries[req.params["shortURL"]];
-  let urlVisitCount = urlsVisited[req.params["shortURL"]];
+  let urlVisitCount = urlsVisitedUnique[req.params["shortURL"]];
   if(urlLink === undefined){
     return res.status(404).send("Invalid tinyURL code entered. Redirect aborted.")
   }
   //Increase total number of uses for this link
   urlLink.uses++;
-  //Increase total number of unique uses for this link by updating a urlsVisited database with global scope:
 
-  if(urlVisitCount === undefined){
-    let newObj = {};
-    newObj[req.session.user_id] = 1;
-    urlsVisited[req.params["shortURL"]] = newObj;
-    urlLink.uniqueUses++;
-  }
-  else if (urlVisitCount[req.session.user_id] === undefined){
-    urlVisitCount[req.session.user_id] = 1;
-    urlLink.uniqueUses++;
+  //Add generated visitor ID to /urls/:shortURL
+  addVisitorID(req);
+
+  //Increase total number of unique uses for this link by updating a urlsVisitedUnique database with global scope
+  //If the url has never been visited, then generate a new object with that user
+
+  if(Object.keys(req.session).length === 1){
+    if(urlVisitCount === undefined){
+      let firstVisit = {};
+      firstVisit[req.session.user_id] = 1;
+      urlsVisitedUnique[req.params["shortURL"]] = firstVisit;
+      urlLink.uniqueUses++;
+    }
+    //If the url has been visited, but not by the current user, then add to it
+    else if (urlVisitCount[req.session.user_id] === undefined){
+      urlVisitCount[req.session.user_id] = 1;
+      urlLink.uniqueUses++;
+    }
   }
   res.redirect(urlLink.url);
 });

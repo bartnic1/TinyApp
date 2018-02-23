@@ -2,6 +2,14 @@
 <html lang="en">
   <head>
     <style>
+      table {
+        border-collapse: collapse;
+        border-spacing: 0px;
+      }
+      table, th, td {
+        padding: 5px;
+        border: 1px solid black;
+      }
       .margin{
         margin: 10px;
       }
@@ -42,6 +50,25 @@
       <form method="GET" action="/urls">
         <input type="submit" value="Back to URL List">
       </form>
+    </div>
+    <div class="margin">
+      <%if(visitLog){%>
+      <table class="center-text">
+      <tr>
+        <th>Generated UserID</th>
+        <th>Date Accessed</th>
+      </tr>
+      <%for(var log of visitLog){%>
+      <tr>
+        <td>
+          <%=log[0]%>
+        </td>
+        <td>
+          <%=log[1]%>
+        </td>
+      </tr>
+      <%}}%>
+      </table>
     </div>
   </body>
 </html>
