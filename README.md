@@ -4,8 +4,11 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["URL Editing Sample"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Edit%20Sample.png)
+### tinyURL Table
 !["URL Table Sample"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Table%20Sample.png)
+
+### tinyURL Editing in Action
+!["URL Editing Sample"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Edit%20Sample.png)
 
 ## Dependencies
 
@@ -20,8 +23,6 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 - Install all dependencies (using the `npm install` command).
 - Run the development web server using the `node express_server.js` command.
-- Navigate to your local server on a browser (for example, with a port number of 8080, go to http://localhost:8080/urls)
-
 - Taking || to be your protocol, local domain, and port number (i.e. || = http://localhost:8080), navigate to ||/urls.
 - New users should register to make a new account; an encrypted cookie will maintain access to user settings throughout the session.
 - Once registered, new users will automatically be logged in to the system. From there, click the hyperlink to Create a New tinyURL.
