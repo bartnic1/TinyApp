@@ -20,7 +20,7 @@
       <% include partials/_header %>
     </div>
     <div class="center-reduced-margin">
-      <h2>Short URL: <b><%= entry.short%></b></h2>
+      <h2>Tiny URL: <b><%= entry.short%></b></h2>
       <form method="POST" action="/urls/<%= entry.short%>">
         <input type="text" value="<%=entry.long%>" name="longURL">
         <input type="submit" value="Update">

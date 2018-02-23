@@ -29,12 +29,13 @@
     <% include partials/_header %>
   </div>
     <!-- Test whether a user is logged in, and whether that user has a database of URLs -->
+    <!-- If both tests pass, then this form automatically generates the necessary number of rows -->
     <%if(user){%>
     <%if(Object.keys(urlDatabase.entries).length !== 0){%>
     <div class="center-div">
     <table>
       <tr>
-        <th>Short URL</th>
+        <th>Tiny URL</th>
         <th>Long URL</th>
         <th>Edit URL</th>
         <th>Delete URL</th>
