@@ -1,12 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head></head>
-  <body style="font-size:20px; padding:50px;">
+  <head>
+    <style>
+      .margin{
+        margin: 10px;
+      }
+      .center-text {
+        text-align: center;
+        margin: 80px 0 0 0;
+      }
+      .center-reduced-margin{
+        text-align: center;
+        margin: 20px 0 0 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="center-text">
     <% include partials/_header %>
-    <form action="/urls" method="POST" style="margin:150px;">
-      <label for="longURL">Enter a URL:</label>
-      <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
-      <input type="submit" value="Submit">
-    </form>
+    </div>
+    <div class="center-reduced-margin">
+      <form method="POST" action="/urls">
+        <label>Enter a URL:
+          <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 200px">
+        </label>
+          <input type="submit" value="Submit">
+      </form>
+    </div>
   </body>
 </html>

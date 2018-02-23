@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  </br>
-  <% include partials/_header %>
-  </br>
   <style>
   table {
     border-collapse: collapse;
@@ -13,12 +10,28 @@
     padding: 5px;
     border: 1px solid black;
   }
+  .center-text {
+    text-align: center;
+    margin: 80px 0 0 0;
+  }
+  .center-reduced-margin{
+    text-align: center;
+    margin: 40px 0 0 0;
+  }
+  .center-div{
+    margin: 0 auto;
+    width: 400px;
+  }
   </style>
 </head>
 <body>
+  <div class="center-text">
+    <% include partials/_header %>
+  </div>
     <!-- Test whether a user is logged in, and whether that user has a database of URLs -->
     <%if(user){%>
     <%if(Object.keys(urlDatabase.entries).length !== 0){%>
+    <div class="center-div">
     <table>
       <tr>
         <th>Short URL</th>
@@ -28,26 +41,39 @@
       </tr>
       <%for (var key in urlDatabase.entries){ %>
       <tr>
-        <td><%=key %></td>
-        <td><%=urlDatabase.entries[key].url %></td>
-        <td><a href="/urls/<%=key%>">Edit</a></td>
         <td>
-        <form method="POST" action="/urls/<%=key%>/delete">
-        <input type="submit" value="Delete" name="<%=key%>" style="margin-left: 15px">
-        </form>
+          <%=key%>
+        </td>
+        <td>
+          <%=urlDatabase.entries[key].url %>
+        </td>
+        <td>
+          <form method="GET" action="/urls/<%=key%>">
+          <input type="submit" value="Edit" style="margin: 5px 15px 5px 15px">
+          </form>
+        </td>
+        <td>
+          <form method="POST" action="/urls/<%=key%>/delete">
+          <input type="submit" value="Delete" name="<%=key%>" style="margin: 5px 15px 5px 15px">
+          </form>
         </td>
       </tr>
+      <%}%>
     </table>
-    <%}}else{%>
-    No URLs created yet!
-    <%}}else{%>
-    Register or login to see your URLs!
-    <%}%>
-    </br></br>
-    <%if(user){%>
-      <a href="/urls/new">Create a New tinyURL</a>
     <%}else{%>
-      <a href="/login">Create a New tinyURL</a>
+    </div>
+      <div class="center-reduced-margin">
+        No URLs created yet!
+      </div>
+    <%}}else{%>
+      <div class="center-reduced-margin">
+        Register or login to see your URLs!
+      </div>
     <%}%>
+  <div class="center-reduced-margin">
+    <%if(user !== undefined){%>
+      <a href="/urls/new">Create a New tinyURL</a>
+    <%}%>
+  </div>
 </body>
 </html>

@@ -108,9 +108,12 @@ app.post("/logout", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  if(Object.keys(req.session).length === 0){
+    return res.status(401).send("No registered user detected. Access denied.")
+  }
   let randURL = generateRandomString();
   urlDatabase.entries[randURL] = {userID: req.session.user_id, url: req.body["longURL"]};
-  res.redirect("/urls");         // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls/${randURL}`);
 });
 
 app.post("/register", (req, res) => {
@@ -132,21 +135,40 @@ app.post("/register", (req, res) => {
 })
 
 app.post("/urls/:id/delete", (req, res) => {
+  if(Object.keys(req.session).length === 0){
+    return res.status(401).send("No registered user detected. Access denied.")
+  }
+  else if(urlDatabase.entries[req.params.id].userID !== req.session.user_id){
+    return res.status(401).send("Incorrect user. Access denied.")
+  }
   delete urlDatabase.entries[req.params.id];
   res.redirect("/urls");
 });
 
 app.post("/urls/:id", (req, res) => {
+  if(Object.keys(req.session).length === 0){
+    return res.status(401).send("No registered user detected. Access denied.")
+  }
+  else if(urlDatabase.entries[req.params.id].userID !== req.session.user_id){
+    return res.status(401).send("Incorrect user. Access denied.")
+  }
   urlDatabase.entries[req.params.id].url = req.body["longURL"];
   res.redirect("/urls");
 });
 
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  if(Object.keys(req.session).length === 1){
+    res.redirect("/urls");
+  }else{
+    res.redirect("/login");
+  }
 });
 
 // http://localhost:8080/urls/new
 app.get("/urls/new", (req, res) => {
+  if(Object.keys(req.session).length === 0){
+    return res.redirect("/login");
+  }
   res.render("urls_new", {urlDatabase: urlDatabase, user: users[req.session.user_id]});
 });
 
@@ -162,34 +184,47 @@ app.get("/urls", (req, res) => {
   //Note that by default, if userInfo is undefined, then entering "user" into
   //urls_index.ejs will result in nothing being generated, because it automatically
   //outputs the value of the key "user".
+
   res.render("urls_index", {urlDatabase: localUrlDatabase, user: userInfo});
 });
 
 app.get("/register", (req, res) => {
+  if(Object.keys(req.session).length === 1){
+    return res.redirect("/urls");
+  }
   res.render("register");
 });
 
 app.get("/login", (req, res) => {
+  if(Object.keys(req.session).length === 1){
+    return res.redirect("/urls");
+  }
   res.render("login")
 })
 
 app.get("/urls/:id", (req, res) => {
-  //loop over elements of local url database
+  //First, test whether the appropriate user has access to the resources on this page
   let accessBool = false;
-  if(Object.keys(req.session).length === 0){
-    return res.status(401).send("Invalid User, access denied");
+  if(urlDatabase.entries[req.params.id] === undefined){
+    return res.status(404).send("Invalid tinyURL code entered; page does not exist.")
+  }
+  else if(Object.keys(req.session).length === 0){
+    return res.status(401).send("No registered user detected. Access denied.");
   }
   else if(urlDatabase.entries[req.params.id].userID === req.session.user_id){
     accessBool = true;
   }
   if(!accessBool){
-    return res.status(401).send("Invalid User, access denied");
+    return res.status(401).send("Incorrect User. Access denied.");
   }
-  let singleEntry = {entry: {short: req.params.id, long: localUrlDatabase.entries[req.params.id].url}, user: users[req.session.user_id]};
+  let singleEntry = {entry: {short: req.params.id, long: urlDatabase.entries[req.params.id].url}, user: users[req.session.user_id]};
   res.render("urls_show", singleEntry);
 });
 
 app.get("/u/:shortURL", (req, res) => {
+  if(urlDatabase.entries[req.params["shortURL"]] === undefined){
+    return res.status(404).send("Invalid tinyURL code entered. Redirect aborted.")
+  }
   let longURL = urlDatabase.entries[req.params["shortURL"]].url;
   res.redirect(longURL);
 });
