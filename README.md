@@ -4,11 +4,11 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-### tinyURL Table
-!["URL Table Sample"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Table%20Sample.png)
+### A Sample tinyURL Table
+!["A Sample URL Table"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Table%20Sample.png)
 
 ### tinyURL Editing in Action
-!["URL Editing Sample"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Edit%20Sample.png)
+!["URL Editing"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Edit%20Sample.png)
 
 ## Dependencies
 
