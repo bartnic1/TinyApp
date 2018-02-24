@@ -36,19 +36,10 @@ function generateRandomString(){
   return newURL;
 }
 
-//Gets the current date; used when generating new URLs.
+// Gets the current date; used when generating new URLs.
 function getDate(){
-  let today = new Date();
-  let day = today.getDate();
-  let month = today.getMonth() + 1;
-  let year = today.getFullYear();
-  if(day < 10){
-    day += '0' + day;
-  }
-  if(month < 10){
-    month = '0' + month;
-  }
-  return `${month}/${day}/${year}`
+  let newDateTime = new Date().toUTCString();
+  return newDateTime;
 }
 
 //This function checks which URLs a user has access to, and logs them to a local URL database (with global scope).
@@ -309,7 +300,6 @@ app.get("/u/:shortURL", (req, res) => {
 
   //Increase total number of unique uses for this link by updating a urlsVisitedUnique database with global scope
   //If the url has never been visited, then generate a new object with that user
-
   if(Object.keys(req.session).length === 1){
     if(urlVisitCount === undefined){
       let firstVisit = {};

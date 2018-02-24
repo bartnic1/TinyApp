@@ -37,12 +37,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 This will immediately redirect the user to the original URL.
 
-## Up and Coming Additions
-
-- A date string indicating when a tinyURL was created
-- A counter indicating how many times a tinyURL was visited
-- A counter indicating the number of unique visits to a tinyURL
-
 ## tinyURL Idiosyncrasies:
 
 - Note that the protocol (http://) must be included for each long-form URL entered into the respective user's database. This will hopefully be fixed on a future release.
+- Also, please erase all cookies before using the application! (In Chrome, open the developer tools by pressing Ctrl+Shift+I, then navigate to Application, and clear the "cookies" section under Storage).
