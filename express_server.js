@@ -85,7 +85,7 @@ function addVisitorID(req){
 //-----------------------------------------------------------------//
 
 //Keeps track of all visitors for a specific URL
-//E.g. urlsVisitedTotal = {}
+//E.g. urlsVisitedTotal = {"b2xVn2": [[user1, 03/12/2018],[...]]}
 const urlsVisitedTotal = {};
 
 //urlsVisitedUnique keeps track of unique visitors for a specific URL
