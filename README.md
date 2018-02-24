@@ -25,13 +25,12 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - Run the development web server using the `node express_server.js` command.
 - Taking || to be your protocol, local domain, and port number (i.e. || = http://localhost:8080), navigate to ||/urls.
 - New users should register to make a new account; an encrypted cookie will maintain access to user settings throughout the session.
-- Once registered, new users will automatically be logged in to the system. From there, click the hyperlink to Create a New tinyURL.
-- Enter in the long-form of the URL, and hit the submit button.
-- You will see a short-form of the URL. Hit Update to confirm your submission.
-- You will now see an updated table listing your tinyURL IDs and their associated long URLs.
-- At any time, the user may edit or delete these URLs.
+- Once registered, new users will automatically be logged in to the system. From there, they should click the link to create a new tinyURL.
+- Once the long-form URL is entered and submitted, the user is redirected to an edit and information screen detailing various statistics on the new URL.
+- Upon returning to ||/urls (by clicking the "Back to URL List" or "Update" if any changes are desired) a table will show a list of all URLs generated.
+- All data is stored across multiple sessions, and the user may edit or delete any tinyURL that belongs to them.
 
-- To navigate to the long-form, simply enter the short URL code (e.g. pi3kpr) into the following address:
+- To use tinyURL to navigate to the long-form URL, simply enter the tinyURL code into ||/u/:tinyURL, as demonstrated below with code "pi3kpr":
 
 ||/u/pi3kpr
 
@@ -39,13 +38,13 @@ This will immediately redirect the user to the actual URL.
 
 ## Useful Features
 
-- The ability to register and login to your account, maintaining a user-specific list of generated tinyURLs
-- Dates and times when your URLs were created and accessed by others
-- The ability to add and delete your URLs, while denying that priviledge to other users (including non-registered users)
+- The ability to register and login to one's account, maintaining a user-specific list of generated tinyURLs
+- The ability to add and delete URLs, while denying that privilege to non-registered or other users
+- Dates and times for when your URLs were created and accessed by others (the latter shown on the edit and information page)
 - Can visit the URLs of other users (which updates stats on their page)
-- Encrypted cookies and hashed passwords for extra security
+- Encrypted cookies and hashed passwords used for extra security
 
 ## tinyURL Idiosyncrasies:
 
-- Note that the protocol (http://) must be included for each long-form URL entered into the respective user's database. This will hopefully be fixed on a future release.
+- Note that the protocol (http://) must be included for each long-form URL added. This will hopefully be fixed on a future release.
 - Also, please erase all cookies before using the application! (In Chrome, open the developer tools by pressing Ctrl+Shift+I, then navigate to Application, and clear the "cookies" section under Storage).
