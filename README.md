@@ -5,10 +5,10 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ## Final Product
 
 ### A Sample tinyURL Table
-!["A Sample URL Table"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Table%20Sample.png)
+!["A Sample URL Table"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Main%20Table.png)
 
 ### tinyURL Editing in Action
-!["URL Editing"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Edit%20Sample.png)
+!["URL Editing"](https://github.com/bartnic1/TinyApp/blob/master/URL%20Edit%20Page.png)
 
 ## Dependencies
 
@@ -35,7 +35,15 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ||/u/pi3kpr
 
-This will immediately redirect the user to the original URL.
+This will immediately redirect the user to the actual URL.
+
+## Useful Features
+
+- The ability to register and login to your account, maintaining a user-specific list of generated tinyURLs
+- Dates and times when your URLs were created and accessed by others
+- The ability to add and delete your URLs, while denying that priviledge to other users (including non-registered users)
+- Can visit the URLs of other users (which updates stats on their page)
+- Encrypted cookies and hashed passwords for extra security
 
 ## tinyURL Idiosyncrasies:
 
