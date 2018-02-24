@@ -85,6 +85,7 @@ function addVisitorID(req){
 //-----------------------------------------------------------------//
 
 //Keeps track of all visitors for a specific URL
+//E.g. urlsVisitedTotal = {}
 const urlsVisitedTotal = {};
 
 //urlsVisitedUnique keeps track of unique visitors for a specific URL
@@ -206,9 +207,11 @@ app.put("/urls/:id", (req, res) => {
     return res.status(401).send("Incorrect user. Access denied.")
   }
   //Reset number of uses if longURL is changed
-  if(req.body["longURL"] !== databaseURLObj){
+  if(req.body["longURL"] !== databaseURLObj.url){
     databaseURLObj.uses = 0;
     databaseURLObj.uniqueUses = 0;
+    delete urlsVisitedUnique[req.params.id];
+    delete urlsVisitedTotal[req.params.id];
   }
   databaseURLObj.url = req.body["longURL"];
   res.redirect("/urls");
