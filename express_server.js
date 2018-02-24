@@ -88,7 +88,7 @@ function addVisitorID(req){
 //E.g. urlsVisitedTotal = {"b2xVn2": [[user1, 03/12/2018],[...]]}
 const urlsVisitedTotal = {};
 
-//urlsVisitedUnique keeps track of unique visitors for a specific URL
+//urlsVisitedUnique keeps track of unique visitors for a specific URL (values are 1 or undefined if the user doesn't exist)
 //E.g. urlsVisitedUnique = {"b2xVn2": {user1: 1, user2: 1}}
 const urlsVisitedUnique = {};
 
@@ -108,7 +108,7 @@ const users = {
 
 //The urlDatabase contains the URLs created by all users. The localUrlDatabase dynamically allocates URLs that were created by currently logged-in users, in the same format.
 
-//Each shortURL is assigned a userID, a long URL, and the time it was created (month/day/year)
+//Each shortURL is assigned a userID, a long URL, the time it was created (month/day/year), as well as uses.
 const urlDatabase = {
   entries: {
   "b2xVn2": {userID: "userRandomID", url: "http://www.lighthouselabs.ca", date:"05/09/2005", uses: 0, uniqueUses: 0},
@@ -246,7 +246,7 @@ app.get("/login", (req, res) => {
   res.render("login")
 })
 
-//This is the main page, that displays all of a user's personal tinyURLs. The urlsForUser() function call ensurse that only URLs tied to their account are visible.
+//This is the main page, that displays all of a user's personal tinyURLs. The urlsForUser() function call ensures that only URLs tied to their account are visible.
 app.get("/urls", (req, res) => {
   let userInfo;
   for(var user in users){
@@ -277,10 +277,7 @@ app.get("/urls/:id", (req, res) => {
   else if(Object.keys(req.session).length === 0){
     return res.status(401).send("No registered user detected. Access denied.");
   }
-  else if(urlDatabase.entries[req.params.id].userID === req.session.user_id){
-    accessBool = true;
-  }
-  if(!accessBool){
+  else if(urlDatabase.entries[req.params.id].userID !== req.session.user_id){
     return res.status(401).send("Incorrect User. Access denied.");
   }
   let databaseURLObj = urlDatabase.entries[req.params.id];
